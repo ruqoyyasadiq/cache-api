@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose')
 
-const Schema = mongoose.Schema;
+const Schema = mongoose.Schema
 
 const cacheSchema = new Schema({
   key: {
@@ -21,7 +21,7 @@ const cacheSchema = new Schema({
     default: Date.now,
     required: true
   }
-});
+})
 
-const Cache = mongoose.model('Cache', cacheSchema);
-export default Cache;
+const Cache = mongoose.model('Cache', cacheSchema)
+module.exports = Cache;
