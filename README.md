@@ -14,3 +14,7 @@ A collection of REST endpoints that exposes methods to interact with a cache
 npm install
 ```
 - Start the server with `npm start`
+
+
+## TODO
+- Add test
