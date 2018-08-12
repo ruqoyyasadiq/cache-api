@@ -1,0 +1,15 @@
+{
+  "extends": "eslint:recommended",
+  "globals": {
+      "module": true,
+      "require": true,
+      "process": true,
+      "console": true,
+      "describe": true,
+      "it": true
+  },
+  "env": {
+      "node": true,
+      "mocha": true
+  }
+}
