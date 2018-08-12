@@ -4,7 +4,7 @@ const utils = require('../utils')
 const { generateRandomData } = utils
 
 const cacheController = {
-
+  // Fecth Data for Single key
   getSingleValue: (req, res) => {
     const { key } = req.params
     Cache.findOne({ key }).exec((err, cache) => {
@@ -31,6 +31,7 @@ const cacheController = {
     })
   },
 
+  // Fetch all cache entries
   getAllKeys: (req, res) => {
     Cache.find({}).select('key -_id').exec((err, result) => {
       if(err) {
@@ -51,6 +52,7 @@ const cacheController = {
     })
   },
 
+  // Create a new cache entry
   createKey: (req, res) => {
     const { body } = req
     body.value = body.value || generateRandomData()
@@ -69,6 +71,7 @@ const cacheController = {
     })
   },
 
+  // update existing cache entry
   updateKey: (req, res) => {
     const { key } = req.params
     const { body } = req.body
@@ -92,6 +95,7 @@ const cacheController = {
 
   },
 
+  // Delete a single cache entry
   removeKey: (req, res) => {
     const { key } = req.params
     Cache.findOneAndDelete({ key }, (err) => {
@@ -103,6 +107,7 @@ const cacheController = {
     })
   },
 
+  // Delete all cache entries
   removeAllKeys: (req, res) => {
     Cache.deleteMany({}, (err) => {
       if (err) {
