@@ -1,37 +1,115 @@
 const Cache = require('../models/cache.model')
+const utils = require('../utils')
+
+const { generateRandomData } = utils
 
 const cacheController = {
+
   getSingleValue: (req, res) => {
     const { key } = req.params
-    Cache.find({ key }).exec((err, cache) => {
+    Cache.findOne({ key }).exec((err, cache) => {
       if(!cache) {
         console.info('Cache miss')
-        // TODO: Create cache value for non-existent key, update db with new key and cache value, return the new value
+        const body = { value: generateRandomData(), ttl: 60 }
+        const cache = new Cache({ key, ...body })
+        cache.save((err, data) => {
+          // TODO: check if key already exists and instead return conflict error
+          if (err) {
+            res.status(500).send({
+              error: err,
+              message: "An error occured whilst fetching data"
+            })
+            return
+          }
+          res.status(201).json({ result: data.value })
+          return
+        })
       } else {
         console.info('Cache hit')
-        res.status(200).json(cache)
+        res.status(200).json({ data: cache.value })
       }
     })
   },
 
   getAllKeys: (req, res) => {
-    Cache.find({}, (err, cache) => {
-      if(!err) {
-        console.log(cache, "All of the cache")
-        const keyList = []
-        if(cache.length > 0) {
-          cache.forEach(key => {
-            keyList.push(key)
-          })
-          res.status(200).json(key)
-          return
-        } else {
-          res.status(200).json({
-            message: 'No key available. Start by creating an entry'
-          })
-          return
-        }
+    Cache.find({}).select('key -_id').exec((err, result) => {
+      if(err) {
+        res.status(500).json({
+          error: err,
+          message: "An error occured whilst fetching data"
+        })
+        return
       }
+      if(result.length > 0) {
+        res.status(200).json({ result })
+        return
+      } else {
+        res.status(200).json({
+          message: 'No cached value available. Start by creating an entry.'
+        })
+      }
+    })
+  },
+
+  createKey: (req, res) => {
+    const { body } = req
+    body.value = body.value || generateRandomData()
+    const cache = new Cache(body)
+    cache.save((err, data) => {
+      // TODO: check if key already exists and instead return conflict error
+      if (err) {
+        res.status(500).send({
+          error: err,
+          message: "An error occured whilst creating data"
+        })
+        return
+      }
+      res.status(201).json({ cache: data })
+      return
+    })
+  },
+
+  updateKey: (req, res) => {
+    const { key } = req.params
+    const { body } = req.body
+    Cache.findByIdAndUpdate({ key }, { body }, (err, result) => {
+      if (err) {
+        res.status(500).json({
+          error: err,
+          message: "An error occured whilst fetching data"
+        })
+        return
+      }
+      if (!result) {
+        res.status(404).json({
+          message: 'No entry exists for given key'
+        })
+      } else {
+        res.status(200).json(result)
+      }
+      return
+    })
+
+  },
+
+  removeKey: (req, res) => {
+    const { key } = req.params
+    Cache.findOneAndDelete({ key }, (err) => {
+      if (err) {
+        res.status(500).json({ error: err })
+        return
+      }
+      res.status(200).json({ message: "Entry has been deleted." })
+    })
+  },
+
+  removeAllKeys: (req, res) => {
+    Cache.deleteMany({}, (err) => {
+      if (err) {
+        res.status(500).json({ error: err })
+        return
+      }
+      res.status(200).json({ message: "All Entries have been deleted." })
     })
   }
 }
