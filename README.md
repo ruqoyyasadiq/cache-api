@@ -9,10 +9,7 @@ A collection of REST endpoints that exposes methods to interact with a cache
 ## Getting Started
 - clone the repo
 - rename `sample.env` to `.env` and set variables appropriately
-- install dependencies with:
-```
-npm install
-```
+- install dependencies with: `npm install`
 - Start the server with `npm start`
 
 
